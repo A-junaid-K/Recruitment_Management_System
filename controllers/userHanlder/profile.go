@@ -5,6 +5,7 @@ import (
 	"RMS_machine_task/db"
 	"RMS_machine_task/domain/models"
 	"RMS_machine_task/domain/response"
+	"RMS_machine_task/helper"
 	"strconv"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -28,6 +29,13 @@ func UploadResume(c *gin.Context) {
 	resume, header, err := c.Request.FormFile("resume")
 	if err != nil {
 		resp := response.ErrResponse{StatusCode: 400, Response: "Failed to get form file request", Error: err.Error()}
+		c.JSON(400, resp)
+		return
+	}
+
+	// validates the format of the uploaded file
+	if err := helper.ValidateFileFormat(header); err != nil {
+		resp := response.ErrResponse{StatusCode: 400, Response: "Invalid file formal. Upload PDF or DOCX files", Error: err.Error()}
 		c.JSON(400, resp)
 		return
 	}

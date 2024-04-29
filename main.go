@@ -16,5 +16,6 @@ func main() {
 	router := gin.Default()
 
 	routes.UserRoutes(router)
+	routes.AdminRoutes(router)
 	router.Run(":4000")
 }

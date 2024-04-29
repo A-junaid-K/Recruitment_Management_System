@@ -11,7 +11,7 @@ import (
 
 func CreateAccessToken(user *models.User, user_type string) (accessToken string, err error) {
 	cfg := config.GetConfig()
-	exp := time.Now().Add(time.Hour * time.Duration(config.GetConfig().AccessTokenExpiryHour)).Unix()
+	exp := time.Now().Add(time.Hour * time.Duration(config.GetConfig().UserAccessTokenExpiryHour)).Unix()
 	claims := &models.JwtCustomClaims{
 		Email: user.Email,
 		Id:    user.Id,
@@ -22,5 +22,22 @@ func CreateAccessToken(user *models.User, user_type string) (accessToken string,
 		},
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	return token.SignedString([]byte(cfg.AccessTokenSecret))
+	return token.SignedString([]byte(cfg.UserAccessTokenSecret))
 }
+
+func CreateAdminAccessToken(admin *models.Admin, user_type string) (accessToken string, err error) {
+	cfg := config.GetConfig()
+	exp := time.Now().Add(time.Hour * time.Duration(config.GetConfig().AdminAccessTokenExpiryHour)).Unix()
+	claims := &models.JwtCustomClaims{
+		Email: admin.Email,
+		Id:    admin.Id,
+		User_type: user_type,
+		StandardClaims: jwt.StandardClaims{
+			ExpiresAt: exp,
+			IssuedAt:  time.Now().Unix(),
+		},
+	}
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	return token.SignedString([]byte(cfg.AdminAccessTokenSecret))
+}
+

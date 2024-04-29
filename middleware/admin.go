@@ -9,12 +9,12 @@ import (
 	"github.com/golang-jwt/jwt"
 )
 
-func ApplicantAuth(c *gin.Context) {
+func AdminAuth(c *gin.Context) {
 	cfg := config.GetConfig()
 	tokenString := c.GetHeader("Authorization")
 
 	if tokenString == "" {
-		err := response.ErrResponse{StatusCode: http.StatusUnauthorized, Response: "Please provide your token", Error: "Empty Token"}
+		err := response.ErrResponse{StatusCode: http.StatusUnauthorized, Response: "Please provide your admin token", Error: "Empty Token"}
 		c.JSON(404, err)
 		return
 	}
@@ -38,7 +38,7 @@ func ApplicantAuth(c *gin.Context) {
 	}
 
 	role, ok := claims["user_type"].(string)
-	if !ok || role != "applicant" {
+	if !ok || role != "admin" {
 		resp := response.ErrResponse{StatusCode: 403, Response: "UnAuthorized Access"}
 		c.JSON(http.StatusForbidden, resp)
 		c.Abort()
@@ -55,5 +55,4 @@ func ApplicantAuth(c *gin.Context) {
 	uid := int(id)
 	c.Set("id", uid)
 
-	// c.Next()
 }

@@ -33,14 +33,9 @@ type JwtCustomClaims struct {
 	jwt.StandardClaims
 }
 
-type JwtCustomRefreshClaim struct {
-	Id int `json:"id"`
-	jwt.StandardClaims
-}
-
-type ChangePassword struct {
+type AdminRegisterRequest struct {
+	Name            string `json:"name,omitempty" validate:"min=3,max=20"`
 	Email           string `json:"email,omitempty" validate:"email"`
-	OldPassword     string `json:"password,omitempty" validate:"min=6"`
-	NewPassword     string `json:"newpassword,omitempty" validate:"min=6"`
+	Password        string `json:"password,omitempty" validate:"min=6"`
 	ConfirmPassword string `json:"confirmpassword" validate:"required,eqfield=Password"`
 }

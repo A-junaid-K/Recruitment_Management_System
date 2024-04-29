@@ -16,8 +16,11 @@ type Config struct {
 	Email         string `mapstructure:"EMAIL"`
 	EmailPassword string `mapstructure:"EMAIL_PASSWORD"`
 
-	AccessTokenSecret      string `mapstructure:"ACCESS_TOKEN_SECRET"`
-	AccessTokenExpiryHour  int    `mapstructure:"ACCESS_TOKEN_EXPIRY_HOUR"`
+	UserAccessTokenSecret     string `mapstructure:"USER_ACCESS_TOKEN_SECRET"`
+	UserAccessTokenExpiryHour int    `mapstructure:"USER_ACCESS_TOKEN_EXPIRY_HOUR"`
+
+	AdminAccessTokenSecret     string `mapstructure:"ADMIN_ACCESS_TOKEN_SECRET"`
+	AdminAccessTokenExpiryHour int    `mapstructure:"ADMIN_ACCESS_TOKEN_EXPIRY_HOUR"`
 
 	AwsBucket          string `mapstructure:"AWS_BUCKET"`
 	AwsRegion          string `mapstructure:"AWS_REGION"`
@@ -28,7 +31,7 @@ type Config struct {
 var cfg Config
 
 func InitConfig() Config {
-	
+
 	viper.AddConfigPath("../")
 	viper.SetConfigFile(".env")
 	if err := viper.ReadInConfig(); err != nil {
