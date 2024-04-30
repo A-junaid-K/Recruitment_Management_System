@@ -25,14 +25,14 @@ type Address struct {
 }
 
 type UserProfile struct {
-	ProfileID         int 
+	ProfileID         int `json:"user_profile_id" gorm:"primaryKey;autoIncrement"`
 	ApplicantID       uint
 	Headline          string `json:"headline"`
 	ResumeFileAddress string `json:"resume_file_address"`
 	Skills            string `json:"skills"`
 
-	Name  string `json:"name,omitempty" validate:"min=3,max=20"`
-	Email string `json:"email,omitempty" validate:"email"`
+	Name  string `json:"name"`
+	Email string `json:"email"`
 	Phone string `json:"phone"`
 }
 

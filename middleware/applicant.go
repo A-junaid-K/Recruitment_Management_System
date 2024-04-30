@@ -3,6 +3,7 @@ package middleware
 import (
 	"RMS_machine_task/config"
 	"RMS_machine_task/domain/response"
+	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -16,16 +17,19 @@ func ApplicantAuth(c *gin.Context) {
 	if tokenString == "" {
 		err := response.ErrResponse{StatusCode: http.StatusUnauthorized, Response: "Please provide your token", Error: "Empty Token"}
 		c.JSON(404, err)
+		c.Abort()
 		return
 	}
 
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		return []byte(cfg.UserAccessTokenSecret), nil
 	})
-
+	log.Println("tokennnnnnnnnnnnnnnn : ", token)
+	log.Println("err : ",err)
 	if err != nil || !token.Valid {
 		resp := response.ErrResponse{StatusCode: 401, Response: "Cannot parse autherizatoin token", Error: err.Error()}
 		c.JSON(401, resp)
+		c.Abort()
 		return
 	}
 

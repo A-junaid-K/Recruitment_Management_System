@@ -5,8 +5,8 @@ import "github.com/golang-jwt/jwt"
 type SignUpRequest struct {
 	Name    string      `json:"name,omitempty" validate:"min=3,max=20"`
 	Email   string      `json:"email,omitempty" validate:"email"`
-	Profile UserProfile `json:"profile,omitempty"`
-	Address Address     `json:"address,omitempty"`
+	Profile UserProfile `json:"profile"`
+	Address Address     `json:"address"`
 
 	Password        string `json:"password,omitempty" validate:"min=6"`
 	ConfirmPassword string `json:"confirmpassword" validate:"required,eqfield=Password"`

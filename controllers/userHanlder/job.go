@@ -65,7 +65,7 @@ func UploadResume(c *gin.Context) {
 	}
 
 	// store in db
-	if err := db.DB.Table("user_profiles").Where("applicant_id=?", user_id).Set("resume_file_address", result.Location).Error; err != nil {
+	if err := db.DB.Table("user_profiles").Where("applicant_id=?", user_id).Update("resume_file_address", result.Location).Error; err != nil {
 		resp := response.ErrResponse{StatusCode: 400, Response: "failed to store resume url in db", Error: err.Error()}
 		c.JSON(400, resp)
 		return
@@ -73,4 +73,12 @@ func UploadResume(c *gin.Context) {
 
 	resp := response.SuccessResnpose{StatusCode: 200, Response: "Succefully Uploaded in S3 Bucket"}
 	c.JSON(200, resp)
+}
+
+func ViewAllOpenings(c *gin.Context) {
+
+}
+
+func Apply(c *gin.Context) {
+
 }

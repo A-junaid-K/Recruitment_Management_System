@@ -149,3 +149,51 @@ func AdminLogin(c *gin.Context) {
 	resp := models.LoginResopnse{StatusCode: http.StatusCreated, Token: token}
 	c.JSON(201, resp)
 }
+
+type applicants struct {
+	Name              string
+	Email             string
+	Headline          string
+	ResumeFileAddress string
+	Skills            string
+	City              string
+	State             string
+	ZipCode           string
+}
+
+func GetAllAplicants(c *gin.Context) {
+	var allusers []applicants
+
+	if err := db.DB.Table("users").
+		Select("users.name, users.email, user_profiles.headline, user_profiles.skills, user_profiles.resume_file_address, addresses.city, addresses.state, addresses.zip_code").
+		Joins("JOIN user_profiles ON users.id = user_profiles.applicant_id").
+		Joins("JOIN addresses ON users.id = addresses.applicant_id").
+		Scan(&allusers).
+		Error; err != nil {
+		res := response.ErrResponse{Response: "Something wrong with findng applicants", Error: err.Error(), StatusCode: 400}
+		c.JSON(http.StatusBadRequest, res)
+		return
+	}
+
+	c.JSON(200, allusers)
+}
+
+func GetApplicantByID(c *gin.Context) {
+	// Recieve Parameter
+	applicant_id := c.Param("applicant_id")
+
+	// Using JOIN Method to get user and profile details
+	var applicant applicants
+	if err := db.DB.Table("users").Where("id=?", applicant_id).
+		Select("users.name, users.email, user_profiles.headline, user_profiles.skills, user_profiles.resume_file_address, addresses.city, addresses.state, addresses.zip_code").
+		Joins("JOIN user_profiles ON users.id = user_profiles.applicant_id").
+		Joins("JOIN addresses ON users.id = addresses.applicant_id").
+		Scan(&applicant).
+		Error; err != nil {
+		res := response.ErrResponse{Response: "Something wrong with findng applicants", Error: err.Error(), StatusCode: 400}
+		c.JSON(http.StatusBadRequest, res)
+		return
+	}
+
+	c.JSONP(http.StatusOK, applicant)
+}

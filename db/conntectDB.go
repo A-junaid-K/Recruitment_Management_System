@@ -28,6 +28,7 @@ func ConnectToDB(c config.Config) (*gorm.DB, error) {
 		&models.UserProfile{},
 
 		&models.Admin{},
+		&models.Job{},
 	)
 	return DB, nil
 }

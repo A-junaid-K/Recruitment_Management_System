@@ -2,17 +2,29 @@ package routes
 
 import (
 	adminHandler "RMS_machine_task/controllers/adminHandler"
+	jobHandler "RMS_machine_task/controllers/jobHandler"
+	"RMS_machine_task/middleware"
 
 	"github.com/gin-gonic/gin"
 )
 
 func AdminRoutes(router *gin.Engine) {
 
-	r := router.Group("/admin")
+	admin := router.Group("/admin")
 	{
-		r.POST("/register", adminHandler.Register)
-		r.POST("/verify-otp", adminHandler.VerifyOtp)
-		r.POST("/login", adminHandler.AdminLogin)
+		admin.POST("/register", adminHandler.Register)
+		admin.POST("/verify-otp", adminHandler.VerifyOtp)
+		admin.POST("/login", adminHandler.AdminLogin)
 
+		admin.GET("/applicants", middleware.AdminAuth, adminHandler.GetAllAplicants)
+		admin.GET("/applicant/:applicant_id", middleware.AdminAuth, adminHandler.GetApplicantByID)
 	}
+
+	job := router.Group("/admin/job")
+	{
+		job.POST("/add-job", middleware.AdminAuth, jobHandler.AddJob)
+		job.GET("/view/:id", middleware.AdminAuth, jobHandler.GetJobByParam)
+		job.GET("/view/all", middleware.AdminAuth, jobHandler.GetAllJob)
+	}
+
 }

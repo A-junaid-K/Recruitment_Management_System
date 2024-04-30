@@ -203,3 +203,59 @@ func UserLogin(c *gin.Context) {
 	resp := models.LoginResopnse{StatusCode: http.StatusCreated, Token: token}
 	c.JSON(201, resp)
 }
+
+func UpdateUserProfile(c *gin.Context) {
+	var body models.UserProfile
+
+	// Bind
+	if err := c.Bind(&body); err != nil {
+		res := response.ErrResponse{Response: "Binding Error", Error: err.Error(), StatusCode: 400}
+		c.JSON(http.StatusBadRequest, res)
+		return
+	}
+
+	// Validate User Request
+	validator := validator.New()
+	if err := validator.Struct(&body); err != nil {
+		resp := response.ErrResponse{StatusCode: http.StatusBadRequest, Response: "Invalid Input", Error: err.Error()}
+		c.JSON(400, resp)
+		return
+	}
+
+	// Applicant from JWT
+	applicant_id := c.GetInt("id")
+
+	// Retrieve existing user profile
+	var existingProfile models.UserProfile
+	if err := db.DB.Table("user_profiles").Where("applicant_id=?", applicant_id).First(&existingProfile).Error; err != nil {
+		resp := response.ErrResponse{StatusCode: http.StatusInternalServerError, Response: "Error while retrieving user profile", Error: err.Error()}
+		c.JSON(http.StatusInternalServerError, resp)
+		return
+	}
+
+	// Merge existing data with new data
+	switch{
+	case body.Headline == "" :
+		body.Headline = existingProfile.Headline
+	case body.Skills == "" :
+		body.Skills = existingProfile.Skills
+	case body.Phone == "" :
+		body.Phone = existingProfile.Phone
+	}
+
+	// Update User Profile
+	err := db.DB.Table("user_profiles").Where("applicant_id=?", applicant_id).Updates(map[string]interface{}{
+		"headline": body.Headline,
+		"skills":   body.Skills,
+		"phone":    body.Phone,
+	}).Error
+
+	if err != nil {
+		resp := response.ErrResponse{StatusCode: http.StatusBadRequest, Response: "Erroe while updating user profile", Error: err.Error()}
+		c.JSON(400, resp)
+		return
+	}
+
+	resp := response.SuccessResnpose{StatusCode: 200, Response: "User profile successfully updated"}
+	c.JSON(200, resp)
+}

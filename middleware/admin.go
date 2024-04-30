@@ -16,16 +16,18 @@ func AdminAuth(c *gin.Context) {
 	if tokenString == "" {
 		err := response.ErrResponse{StatusCode: http.StatusUnauthorized, Response: "Please provide your admin token", Error: "Empty Token"}
 		c.JSON(404, err)
+		c.Abort()
 		return
 	}
 
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-		return []byte(cfg.UserAccessTokenSecret), nil
+		return []byte(cfg.AdminAccessTokenSecret), nil
 	})
 
 	if err != nil || !token.Valid {
-		resp := response.ErrResponse{StatusCode: 401, Response: "Cannot parse autherizatoin token", Error: err.Error()}
+		resp := response.ErrResponse{StatusCode: 401, Response: "Cannot parse authorization token", Error: err.Error()}
 		c.JSON(401, resp)
+		c.Abort()
 		return
 	}
 
