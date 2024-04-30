@@ -18,6 +18,7 @@ func AdminRoutes(router *gin.Engine) {
 
 		admin.GET("/applicants", middleware.AdminAuth, adminHandler.GetAllAplicants)
 		admin.GET("/applicant/:applicant_id", middleware.AdminAuth, adminHandler.GetApplicantByID)
+		
 	}
 
 	job := router.Group("/admin/job")

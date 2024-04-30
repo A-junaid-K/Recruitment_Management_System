@@ -17,11 +17,11 @@ type User struct {
 }
 
 type Address struct {
-	Address_ID uint   `json:"address_id" gorm:"primaryKey;autoIncrement"`
-	ApplicantID       uint
-	City       string `json:"city" gorm:"not null"`
-	State      string `json:"state" gorm:"not null"`
-	ZipCode    string `json:"zip_code" gorm:"not null"`
+	Address_ID  uint `json:"address_id" gorm:"primaryKey;autoIncrement"`
+	ApplicantID uint
+	City        string `json:"city" gorm:"not null"`
+	State       string `json:"state" gorm:"not null"`
+	ZipCode     string `json:"zip_code" gorm:"not null"`
 }
 
 type UserProfile struct {
@@ -31,13 +31,15 @@ type UserProfile struct {
 	ResumeFileAddress string `json:"resume_file_address"`
 	Skills            string `json:"skills"`
 
+	Education           string
+	EducationUrl        string
+	EducationTimePeriod time.Time
+
+	Experience           string
+	CompanyUrl           string
+	ExperienceTimePeriod time.Time
+
 	Name  string `json:"name"`
 	Email string `json:"email"`
-	Phone string `json:"phone"`
-}
-
-type Education struct {
-}
-
-type Experience struct {
+	Phone int    `json:"phone"`
 }
