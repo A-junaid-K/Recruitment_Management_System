@@ -197,3 +197,23 @@ func GetApplicantByID(c *gin.Context) {
 
 	c.JSONP(http.StatusOK, applicant)
 }
+
+func GetAllResume(c *gin.Context) {
+	type resume struct {
+		ResumeFileAddress string
+	}
+	var allresume resume
+	if err := db.DB.Table("user_profiles").Select("resume_file_address").Find(&allresume).Error; err != nil {
+		res := response.ErrResponse{Response: "Something wrong with findng applicants Resume", Error: err.Error(), StatusCode: 400}
+		c.JSON(http.StatusBadRequest, res)
+		return
+	}
+
+	// if allresume.ResumeFileAddress == "" {
+	// 	res := response.ErrResponse{Response: "No Resume is provided", Error: "", StatusCode: 400}
+	// 	c.JSON(http.StatusBadRequest, res)
+	// 	return
+	// }
+
+	c.JSON(200, allresume)
+}

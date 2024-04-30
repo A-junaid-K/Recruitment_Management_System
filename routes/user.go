@@ -20,6 +20,7 @@ func UserRoutes(router *gin.Engine) {
 
 		user.POST("/add-education", middleware.ApplicantAuth, userHandler.AddEducation)
 		user.POST("/add-experience", middleware.ApplicantAuth, userHandler.AddExperience)
+		user.POST("/add-skills", middleware.ApplicantAuth, userHandler.AddSkill)
 	}
 
 	router.POST("/extract-resume", userHandler.ExtractResume) // Third party API rate limit exceeded. processing

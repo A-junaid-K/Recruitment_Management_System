@@ -80,10 +80,12 @@ func UserSignup(c *gin.Context) {
 
 	// Upload User Profile in DB
 	userProfile := &models.UserProfile{
-		ApplicantID: uint(signeduser.Id),
-		Headline:    body.Profile.Headline,
-		Name:        body.Name,
-		Email:       body.Email,
+		ApplicantID:          uint(signeduser.Id),
+		Headline:             body.Profile.Headline,
+		Name:                 body.Name,
+		Email:                body.Email,
+		EducationTimePeriod:  time.Time{},
+		ExperienceTimePeriod: time.Time{},
 	}
 	if err := db.DB.Create(userProfile).Error; err != nil {
 		resp := response.ErrResponse{StatusCode: 400, Response: "Failed to Create user profile", Error: err.Error()}
@@ -338,7 +340,7 @@ func AddExperience(c *gin.Context) {
 	// Retrieve existing user profile
 	var existingProfile models.UserProfile
 	if err := db.DB.Table("user_profiles").Where("applicant_id=?", applicant_id).First(&existingProfile).Error; err != nil {
-		resp := response.ErrResponse{StatusCode: http.StatusInternalServerError, Response: "Error while add Experience", Error: err.Error()}
+		resp := response.ErrResponse{StatusCode: http.StatusInternalServerError, Response: "Error while fetch existing user data", Error: err.Error()}
 		c.JSON(http.StatusInternalServerError, resp)
 		return
 	}
@@ -357,11 +359,61 @@ func AddExperience(c *gin.Context) {
 	}).Error
 
 	if err != nil {
-		resp := response.ErrResponse{StatusCode: http.StatusBadRequest, Response: "Erroe while updating user profile", Error: err.Error()}
+		resp := response.ErrResponse{StatusCode: http.StatusBadRequest, Response: "Erroe while add experience", Error: err.Error()}
 		c.JSON(400, resp)
 		return
 	}
 
 	resp := response.SuccessResnpose{StatusCode: 200, Response: "Successfully added Applicant Experience"}
+	c.JSON(200, resp)
+}
+
+func AddSkill(c *gin.Context) {
+	var body models.UserProfile
+
+	// Bind
+	if err := c.Bind(&body); err != nil {
+		res := response.ErrResponse{Response: "Binding Error", Error: err.Error(), StatusCode: 400}
+		c.JSON(http.StatusBadRequest, res)
+		return
+	}
+
+	// Validate User Request
+	validator := validator.New()
+	if err := validator.Struct(&body); err != nil {
+		resp := response.ErrResponse{StatusCode: http.StatusBadRequest, Response: "Invalid Input", Error: err.Error()}
+		c.JSON(400, resp)
+		return
+	}
+
+	// Applicant from JWT
+	applicant_id := c.GetInt("id")
+
+	// Retrieve existing user profile
+	var existingProfile models.UserProfile
+	if err := db.DB.Table("user_profiles").Where("applicant_id=?", applicant_id).First(&existingProfile).Error; err != nil {
+		resp := response.ErrResponse{StatusCode: http.StatusInternalServerError, Response: "Error while fetch existing data", Error: err.Error()}
+		c.JSON(http.StatusInternalServerError, resp)
+		return
+	}
+
+	// Merge existing data with new data
+	switch {
+	case body.Skills == "":
+		body.Skills = existingProfile.Skills
+	}
+
+	// Update User Profile
+	err := db.DB.Table("user_profiles").Where("applicant_id=?", applicant_id).Updates(map[string]interface{}{
+		"skills": body.Skills,
+	}).Error
+
+	if err != nil {
+		resp := response.ErrResponse{StatusCode: http.StatusBadRequest, Response: "Erroe while adding skill", Error: err.Error()}
+		c.JSON(400, resp)
+		return
+	}
+
+	resp := response.SuccessResnpose{StatusCode: 200, Response: "Successfully added Applicant Skills"}
 	c.JSON(200, resp)
 }
